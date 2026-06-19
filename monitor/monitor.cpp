@@ -64,7 +64,7 @@ void GpuMonitorThread() {
         g_gpuOk.store(true);
         while (g_running) {
             unsigned int util[2] = { 0 }, temp = 0;
-            unsigned long long mem[3] = { 0 }; // total, free, used
+            unsigned long long mem[3] = { 0 };
 
             if (getUtil) getUtil(dev, &util);
             if (getMem) getMem(dev, &mem);
