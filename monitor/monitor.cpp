@@ -13,6 +13,24 @@ std::atomic<unsigned int> g_gpu{ 0 }, g_gpuTemp{ 0 };
 std::atomic<double> g_vramU{ 0.0 }, g_vramT{ 0.0 };
 std::atomic<bool> g_gpuOk{ false }, g_running{ true };
 
+double ClampDiskActive(double rawValue) {
+    return rawValue > 100.0 ? 100.0 : (rawValue < 0.0 ? 0.0 : rawValue);
+}
+
+double BytesToMegabytes(double bytes) {
+    if (bytes < 0.0) return 0.0;
+    return bytes / 1024.0 / 1024.0;
+}
+
+double BytesToGigabytes(unsigned long long bytes) {
+    return static_cast<double>(bytes) / 1024.0 / 1024.0 / 1024.0;
+}
+
+double CalculateRamPercentage(double used, double total) {
+    if (total <= 0.0) return 0.0;
+    return (used / total) * 100.0;
+}
+
 void SystemMonitorThread() {
     PDH_HQUERY query;
     PDH_HCOUNTER cCpu, cDiskA, cDiskR, cDiskW;
@@ -29,21 +47,27 @@ void SystemMonitorThread() {
         PdhCollectQueryData(query);
 
         PDH_FMT_COUNTERVALUE vCpu, vDiskA, vDiskR, vDiskW;
+
         PdhGetFormattedCounterValue(cCpu, PDH_FMT_DOUBLE, NULL, &vCpu);
         PdhGetFormattedCounterValue(cDiskA, PDH_FMT_DOUBLE, NULL, &vDiskA);
         PdhGetFormattedCounterValue(cDiskR, PDH_FMT_DOUBLE, NULL, &vDiskR);
         PdhGetFormattedCounterValue(cDiskW, PDH_FMT_DOUBLE, NULL, &vDiskW);
 
+
         g_cpu.store(vCpu.doubleValue);
-        g_diskActive.store(vDiskA.doubleValue > 100.0 ? 100.0 : vDiskA.doubleValue);
-        g_diskRead.store(vDiskR.doubleValue / 1024.0 / 1024.0);
-        g_diskWrite.store(vDiskW.doubleValue / 1024.0 / 1024.0);
+        g_diskActive.store(ClampDiskActive(vDiskA.doubleValue));
+        g_diskRead.store(BytesToMegabytes(vDiskR.doubleValue));
+        g_diskWrite.store(BytesToMegabytes(vDiskW.doubleValue));
 
         MEMORYSTATUSEX mem; mem.dwLength = sizeof(mem);
         GlobalMemoryStatusEx(&mem);
-        g_ramT.store(mem.ullTotalPhys / 1024.0 / 1024.0 / 1024.0);
-        g_ramU.store(g_ramT.load() - (mem.ullAvailPhys / 1024.0 / 1024.0 / 1024.0));
-        g_ramP.store((g_ramU.load() / g_ramT.load()) * 100.0);
+
+        double totalRam = BytesToGigabytes(mem.ullTotalPhys);
+        double usedRam = totalRam - BytesToGigabytes(mem.ullAvailPhys);
+
+        g_ramT.store(totalRam);
+        g_ramU.store(usedRam);
+        g_ramP.store(CalculateRamPercentage(usedRam, totalRam));
     }
     PdhCloseQuery(query);
 }
@@ -71,8 +95,8 @@ void GpuMonitorThread() {
             if (getTemp) getTemp(dev, 0, &temp);
 
             g_gpu.store(util[0]);
-            g_vramT.store(mem[0] / 1024.0 / 1024.0 / 1024.0);
-            g_vramU.store(mem[2] / 1024.0 / 1024.0 / 1024.0);
+            g_vramT.store(BytesToGigabytes(mem[0]));
+            g_vramU.store(BytesToGigabytes(mem[2]));
             g_gpuTemp.store(temp);
 
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -81,6 +105,7 @@ void GpuMonitorThread() {
     FreeLibrary(h);
 }
 
+#ifndef IS_TEST_BUILD
 int main() {
     std::thread t1(SystemMonitorThread);
     std::thread t2(GpuMonitorThread);
@@ -104,3 +129,4 @@ int main() {
     if (t2.joinable()) t2.join();
     return 0;
 }
+#endif
