@@ -22,6 +22,14 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
+    # 2.5. Инициализация NuGet и восстановление пакетов (Google Test)
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages
+      run: |
+        nuget restore monitor.sln
+
     # 3. Сборка основного приложения (Release x64)
     - name: Build Application (Release x64)
       run: |
@@ -32,7 +40,7 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD monitor.cpp monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
+        cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" monitor.cpp monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
 
     # 5. Запуск ТОЛЬКО юнит-тестов (фильтрация по категории Unit)
     - name: Run Unit Tests Only
