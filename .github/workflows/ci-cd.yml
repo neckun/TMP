@@ -45,7 +45,7 @@ jobs:
     - name: Compile Google Tests (x64)
       shell: cmd
       run: |
-        cl.exe /EHsc /D_MBCS monitor/monitor.cpp monitor/tests.cpp /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" /link /LIBPATH:"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\lib\native\v140\windesktop\msvcstl\static\rt-dyn\x64\Release" gtest.lib gtest_main.lib /OUT:google_tests.exe
+        cl.exe /EHsc /MD /D_MBCS monitor/monitor.cpp monitor/tests.cpp /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" /link /LIBPATH:"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\lib\native\v140\windesktop\msvcstl\static\rt-dyn\x64\Release" gtest.lib gtest_main.lib /OUT:google_tests.exe
 
     # 7. Запуск тестов Google Test
     - name: Run Google Tests
