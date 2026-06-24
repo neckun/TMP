@@ -22,7 +22,7 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    # 2.5. Инициализация NuGet и восстановление пакетов (Google Test)
+    # 3. Инициализация NuGet и восстановление пакетов (Google Test)
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
@@ -30,28 +30,29 @@ jobs:
       run: |
         nuget restore monitor/monitor.vcxproj -PackagesDirectory packages
 
-    # 3. Сборка основного приложения (Release x64)
+    # 4. Сборка основного приложения (Release x64)
     - name: Build Application (Release x64)
       run: |
         msbuild monitor/monitor.vcxproj /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
-    # 4. Инициализация окружения разработчика и сборка тестовой DLL
+    # 5. Инициализация окружения компилятора MSVC
     - name: Set up Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
 
-    - name: Compile Tests DLL (x64)
+    # 6. Сборка исполняемого файла Google Test (tests.exe)
+    - name: Compile Google Tests (x64)
       shell: cmd
       run: |
-        cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" monitor/monitor.cpp monitor/monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
+        cl.exe /EHsc /D_MBCS monitor/monitor.cpp monitor/tests.cpp /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" /link /LIBPATH:"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\lib\native\v140\windesktop\msvcstl\static\rt-dyn\x64\Release" gtest.lib gtest_main.lib /OUT:google_tests.exe
 
-    # 5. Запуск ТОЛЬКО юнит-тестов (фильтрация по категории Unit)
-    - name: Run Unit Tests Only
+    # 7. Запуск тестов Google Test
+    - name: Run Google Tests
       run: |
-        vstest.console.exe monitor_tests.dll /Platform:x64 /TestCaseFilter:"TestCategory=Unit"
+        ./google_tests.exe
 
-    # 6. Подготовка артефактов к публикации при успешных тестах
+    # 8. Подготовка артефактов к публикации при успешных тестах
     - name: Prepare Artifacts
       shell: pwsh
       run: |
@@ -59,14 +60,14 @@ jobs:
         cp x64/Release/monitor.exe output/monitor.exe
         Compress-Archive -Path output/monitor.exe -DestinationPath output/monitor-windows-x64.zip
 
-    # 7. Сохранение собранного бинарника в GitHub Actions
+    # 9. Сохранение собранного бинарника в GitHub Actions
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: monitor-windows-x64-binary
         path: output/monitor.exe
 
-    # 8. Публикация релиза на GitHub (только при создании тега v*)
+    # 10. Публикация релиза на GitHub (только при создании тега v*)
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
