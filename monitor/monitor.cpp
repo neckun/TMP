@@ -81,6 +81,7 @@ void GpuMonitorThread() {
     FreeLibrary(h);
 }
 
+#ifndef IS_TEST_BUILD
 int main() {
     std::thread t1(SystemMonitorThread);
     std::thread t2(GpuMonitorThread);
@@ -104,3 +105,5 @@ int main() {
     if (t2.joinable()) t2.join();
     return 0;
 }
+#endif
+
