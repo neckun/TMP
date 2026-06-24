@@ -22,15 +22,15 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    # 3. Восстановление пакетов NuGet (Google Test) для всего решения автоматически
+    # 3. Восстановление пакетов NuGet (Google Test) — автоматический поиск файла .sln в любых папках
     - name: Restore NuGet Packages
       run: |
-        nuget restore monitor/monitor.sln
+        nuget restore **/*.sln
 
-    # 4. Сборка всего решения (MSBuild сам соберет и проект monitor.exe, и проект Test.exe)
+    # 4. Сборка всего решения (MSBuild автоматически найдет и соберет файлы .sln)
     - name: Build Solution (Release x64)
       run: |
-        msbuild monitor/monitor.sln /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
+        msbuild **/*.sln /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
 
     # 5. Запуск тестов Google Test напрямую из собранного бинарника
