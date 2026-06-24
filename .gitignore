@@ -1,0 +1,24 @@
+# Скрытая папка настроек самой Visual Studio
+.vs/
+
+# Папки с результатами компиляции (бинарные файлы)
+[Bb]in/
+[Oo]bj/
+
+# Результаты сборки C++ проектов
+Generated Files/
+An invasion of artifacts/
+x64/
+x86/
+Release/
+Debug/
+
+# Файлы пользовательских настроек (размеры окон, открытые вкладки)
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Логи и отчеты об ошибках
+*.log
+*.tlog
