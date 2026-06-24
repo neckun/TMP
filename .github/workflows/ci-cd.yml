@@ -44,7 +44,7 @@ jobs:
     - name: Compile Tests DLL (x64)
       shell: cmd
       run: |
-        cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" monitor.cpp monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
+        cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" monitor/monitor.cpp monitor/monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
 
     # 5. Запуск ТОЛЬКО юнит-тестов (фильтрация по категории Unit)
     - name: Run Unit Tests Only
