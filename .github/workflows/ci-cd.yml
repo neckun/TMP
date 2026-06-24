@@ -22,10 +22,10 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    # 3. Восстановление пакетов NuGet (Google Test) через dotnet, который поддерживает формат .slnx
+    # 3. Восстановление пакетов NuGet принудительно в локальную папку packages репозитория
     - name: Restore NuGet Packages
       run: |
-        dotnet restore monitor.slnx
+        dotnet restore monitor.slnx --packages packages
 
     # 4. Сборка всего решения через MSBuild (указываем точное имя нового формата)
     - name: Build Solution (Release x64)
