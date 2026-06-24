@@ -27,17 +27,12 @@ jobs:
       run: |
         msbuild monitor.slnx /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
-    # 4. Сборка всего решения через MSBuild (указываем точное имя нового формата)
-    - name: Build Solution (Release x64)
-      run: |
-        msbuild monitor.slnx /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
-
-    # 5. Запуск тестов Google Test напрямую из собранного бинарника
+    # 4. Запуск тестов Google Test напрямую из собранного бинарника
     - name: Run Google Tests
       run: |
         ./x64/Release/Test.exe
 
-    # 6. Подготовка артефактов к публикации (сохраняем рабочую программу)
+    # 5. Подготовка артефактов к публикации (сохраняем рабочую программу)
     - name: Prepare Artifacts
       shell: pwsh
       run: |
@@ -45,14 +40,14 @@ jobs:
         cp x64/Release/monitor.exe output/monitor.exe
         Compress-Archive -Path output/monitor.exe -DestinationPath output/monitor-windows-x64.zip
 
-    # 7. Сохранение собранного бинарника в артефакты сборки GitHub
+    # 6. Сохранение собранного бинарника в артефакты сборки GitHub
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: monitor-windows-x64-binary
         path: output/monitor.exe
 
-    # 8. Создание официального GitHub релиза (только при создании тега версии v*)
+    # 7. Создание официального GitHub релиза (только при создании тега версии v*)
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
