@@ -28,7 +28,7 @@ jobs:
 
     - name: Restore NuGet Packages
       run: |
-        nuget restore monitor.sln
+        nuget restore monitor/monitor.vcxproj
 
     # 3. Сборка основного приложения (Release x64)
     - name: Build Application (Release x64)
