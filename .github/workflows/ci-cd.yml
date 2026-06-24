@@ -22,10 +22,10 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    # 3. Восстановление пакетов NuGet силами самого MSBuild с сохранением регистра папок
-    - name: Restore NuGet Packages
+    # 3. Сборка всего решения (Все пакеты уже на месте в репозитории)
+    - name: Build Solution (Release x64)
       run: |
-        msbuild monitor.slnx /t:restore
+        msbuild monitor.slnx /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
     # 4. Сборка всего решения через MSBuild (указываем точное имя нового формата)
     - name: Build Solution (Release x64)
