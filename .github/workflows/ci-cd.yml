@@ -25,12 +25,13 @@ jobs:
     # 3. Восстановление пакетов NuGet (Google Test) для всего решения автоматически
     - name: Restore NuGet Packages
       run: |
-        nuget restore monitor.sln
+        nuget restore monitor/monitor.sln
 
     # 4. Сборка всего решения (MSBuild сам соберет и проект monitor.exe, и проект Test.exe)
     - name: Build Solution (Release x64)
       run: |
-        msbuild monitor.sln /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
+        msbuild monitor/monitor.sln /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
+
 
     # 5. Запуск тестов Google Test напрямую из собранного бинарника
     - name: Run Google Tests
