@@ -15,19 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="monitor.cpp">
+    <ClCompile Include="Test.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="..\monitor\monitor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="monitor.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
