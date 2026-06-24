@@ -22,16 +22,15 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    # 3. Восстановление пакетов NuGet (Google Test) — автоматический поиск файла .sln в любых папках
+    # 3. Восстановление пакетов NuGet (Google Test) через dotnet, который поддерживает формат .slnx
     - name: Restore NuGet Packages
       run: |
-        nuget restore **/*.sln
+        dotnet restore monitor.slnx
 
-    # 4. Сборка всего решения (MSBuild автоматически найдет и соберет файлы .sln)
+    # 4. Сборка всего решения через MSBuild (указываем точное имя нового формата)
     - name: Build Solution (Release x64)
       run: |
-        msbuild **/*.sln /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
-
+        msbuild monitor.slnx /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
     # 5. Запуск тестов Google Test напрямую из собранного бинарника
     - name: Run Google Tests
