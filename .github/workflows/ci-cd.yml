@@ -25,7 +25,7 @@ jobs:
     # 3. Сборка основного приложения (Release x64)
     - name: Build Application (Release x64)
       run: |
-        msbuild monitor.vcxproj /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
+        msbuild monitor/monitor.vcxproj /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
     # 4. Сборка тестовой DLL строго через 64-битный компилятор
     - name: Compile Tests DLL (x64)
