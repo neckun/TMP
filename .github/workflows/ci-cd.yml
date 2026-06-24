@@ -35,11 +35,15 @@ jobs:
       run: |
         msbuild monitor/monitor.vcxproj /p:Configuration=Release /p:Platform=x64 /p:RunCodeAnalysis=true
 
-    # 4. Сборка тестовой DLL строго через 64-битный компилятор
+    # 4. Инициализация окружения разработчика и сборка тестовой DLL
+    - name: Set up Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
     - name: Compile Tests DLL (x64)
       shell: cmd
       run: |
-        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cl.exe /LD /EHsc /D_WINDLL /D_MBCS /DIS_TEST_BUILD /I"packages/Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.8\build\native\include" monitor.cpp monitor_ci_cd.cpp /link /OUT:monitor_tests.dll
 
     # 5. Запуск ТОЛЬКО юнит-тестов (фильтрация по категории Unit)
